@@ -1,0 +1,24 @@
+{
+  "name": "circulo",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Círculo: instrumento musical modular para celular (PWA) con notas circulares, bend y vibrato",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && node scripts/build-worklet.mjs && vite build",
+    "build:worklet": "node scripts/build-worklet.mjs",
+    "preview": "vite preview --host",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "icons": "node scripts/generate-icons.mjs",
+    "check": "tsc --noEmit && vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "jsdom": "^25.0.1",
+    "typescript": "~5.7.2",
+    "vite": "^6.0.0",
+    "vitest": "^2.1.8"
+  }
+}

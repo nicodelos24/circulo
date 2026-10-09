@@ -26,6 +26,27 @@ Para tocarlo desde el celular, `npm run dev` imprime una URL tipo
 Al abrirla, usa *Añadir a pantalla de inicio* para tener el icono, pantalla
 completa yorientation horizontal forzada: ahí sí funciona sin red.
 
+## Publicar en GitHub Pages
+
+El sitio que se publica es **`dist/`**, no el código fuente: `index.html` a
+pelado apunta a `/src/index.ts`, que en un repo servido tal cual da 404 y la
+app se ve en blanco.
+
+El repo trae `.github/workflows/deploy.yml`, que compila (con `npm run check`
+antes) y sube `dist/` a Pages. Para activarlo:
+
+1. Sube estos cambios a `main`.
+2. En el repo: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+3. La primera acción tarda un par de minutos; a partir de ahí, cada `push`
+   a `main` publica el sitio.
+
+Si prefieres hacerlo a mano: `npm run build`, copia **el contenido** de
+`dist/` a una rama `gh-pages` (o a `docs/`) y apúnta Pages a esa carpeta.
+
+Mientras tanto, si la página se queda en blanco, el propio `index.html`
+muestra un panel con el motivo: archivo no encontrado, navegador sin Web
+Audio o error de arranque. No hace falta abrir la consola para saber qué pasó.
+
 ## Cómo se toca
 
 ### Guitarra: celular de lado (modo por defecto)

@@ -20,11 +20,117 @@
     <link rel="icon" href="./icon-192.png" sizes="192x192" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <title>Círculo · instrumento musical para celular</title>
+    <style>
+      /* Estilos mínimos en línea: el tablero se dibuja en canvas, pero si el
+         módulo no carga, este bloque es lo único que se ve. */
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #06070f;
+        color: #eaf1ff;
+        font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+        overscroll-behavior: none;
+      }
+      #boot-error {
+        position: fixed;
+        inset: 0;
+        display: none;
+        flex-direction: column;
+        gap: 14px;
+        align-content: center;
+        padding: 28px 24px;
+        background: radial-gradient(120% 90% at 50% 0%, #131a35, #06070f);
+        z-index: 100;
+      }
+      #boot-error h1 {
+        margin: 0;
+        font-size: 19px;
+        letter-spacing: 0.04em;
+      }
+      #boot-error p {
+        margin: 0;
+        max-width: 46ch;
+        line-height: 1.55;
+        color: rgba(206, 220, 248, 0.72);
+        font-size: 14px;
+      }
+      #boot-error code {
+        font-family: ui-monospace, 'SF Mono', monospace;
+        font-size: 12px;
+        background: rgba(255, 255, 255, 0.08);
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+      #boot-error ul {
+        margin: 0;
+        padding-left: 18px;
+        color: rgba(206, 220, 248, 0.72);
+        font-size: 13px;
+        line-height: 1.7;
+      }
+    </style>
   </head>
   <body>
     <div id="app"></div>
     <p class="rotate-hint">Gira el celular: se toca de lado, como un mástil de guitarra ⟳</p>
     <noscript>Círculo necesita JavaScript y Web Audio para sonar.</noscript>
-    <script type="module" src="/src/index.ts"></script>
+
+    <!--
+      Si el módulo no llega a ejecutarse (ruta equivocada, caché viejo, error de
+      red) la app se vería en blanco sin pista de por qué. Este bloque vive en el
+      HTML, no en el bundle, así que es lo último que puede funcionar.
+    -->
+    <script>
+      (function () {
+        var panel = null;
+        function show(title, detail, list) {
+          if (panel) return;
+          var app = document.getElementById('app');
+          if (app && app.childElementCount > 0) return;
+          panel = document.createElement('section');
+          panel.id = 'boot-error';
+          var html = '<h1>' + title + '</h1>';
+          if (detail) html += '<p>' + detail + '</p>';
+          if (list) html += '<ul>' + list + '</ul>';
+          panel.innerHTML = html;
+          panel.style.display = 'flex';
+          document.body.appendChild(panel);
+        }
+        window.addEventListener('error', function (event) {
+          if (event.target && event.target.tagName === 'SCRIPT') {
+            show(
+              'No se pudo cargar el programa',
+              'El archivo <code>' + (event.target.getAttribute('src') || '?') + '</code> no se encontró en el servidor.',
+              [
+                'Si esto es GitHub Pages, casi siempre significa que se está publicando la raíz del repositorio en vez de la carpeta <code>dist/</code>.',
+                'Vuelve a <em>Settings → Pages</em> y deja que la acción de GitHub Actions publique el sitio.',
+              ],
+            );
+            return;
+          }
+          show('Algo falló al arrancar', (event.error && event.error.message) || event.message);
+        });
+        window.addEventListener('unhandledrejection', function (event) {
+          var reason = event.reason && (event.reason.message || event.reason);
+          show('Algo falló al arrancar', String(reason || 'promesa rechazada'));
+        });
+        setTimeout(function () {
+          var app = document.getElementById('app');
+          if (app && app.childElementCount > 0) return;
+          var audio = window.AudioContext || window.webkitAudioContext;
+          if (!audio) {
+            show(
+              'Este navegador no tiene Web Audio',
+              'Círculo necesita la API de audio (y AudioWorklet) para sonar. Prueba con Chrome, Safari o Firefox actualizados.',
+            );
+            return;
+          }
+          show('La app no arrancó', 'Toca los círculos: deberían aparecer. Si no, revisa la consola del navegador.');
+        }, 4000);
+      })();
+    </script>
+
+    <script type="module" src="./src/index.ts"></script>
   </body>
 </html>
